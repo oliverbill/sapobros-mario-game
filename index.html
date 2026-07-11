@@ -62,6 +62,8 @@
     pointer-events:none;
   }
   #hud .box { background:rgba(0,0,0,.28); padding:5px 12px; border-radius:8px; }
+  #muteBtn { pointer-events:auto; cursor:pointer; user-select:none; }
+  #muteBtn.off { opacity:.55; }
   /* Touch controls — centralizados verticalmente nas laterais (bom p/ paisagem)
      e respeitando a área segura do iPhone (notch/home indicator). */
   #touch { position:absolute; inset:0; display:none; pointer-events:none; }
@@ -106,6 +108,7 @@
     <span class="box">Fase <span id="level">1</span></span>
     <span class="box" id="powerBox">Poder <span id="power">—</span></span>
     <span class="box">❤ <span id="lives">3</span></span>
+    <span class="box" id="muteBtn" title="Ligar/desligar som (M)">🔊</span>
   </div>
 
   <!-- Start / character select -->
@@ -156,6 +159,7 @@
 </div>
 
 <script src="assets.js"></script>
+<script src="sound.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

@@ -34,8 +34,18 @@ python3 -m http.server 8000   # ou: npx serve
 | Mover   | ← / →                | Botões ◀ ▶       |
 | Pular   | ↑ ou Barra de espaço | Botão ▲          |
 | Atirar 🔥 | F ou X             | Botão 🔥 (aparece com a flor de fogo) |
+| Mudo    | M                    | Botão 🔊 / 🔇 no HUD |
 
 Segure o botão de pulo para pular mais alto (altura variável).
+
+## Som
+
+Efeitos sonoros e música de fundo no estilo **8-bit / chiptune** (pulo, moeda,
+power-up, pisão, fogo, dano, morte, fim de fase e game over), tudo **sintetizado
+no navegador** com a Web Audio API — nenhum arquivo de áudio externo. São
+composições **originais** que evocam os clássicos plataformas 8-bit (não usam
+áudio protegido). Use o botão **🔊 / 🔇** no HUD (ou a tecla **M**) para
+ligar/desligar; a preferência é salva.
 
 ## Power-ups (estilo Mario)
 
@@ -87,5 +97,6 @@ progresso.
 - `index.html` — estrutura, telas (início, seleção de personagem, mensagens) e HUD.
 - `game.js` — motor do jogo, física, níveis, power-ups e renderização.
 - `assets.js` — sprites embutidos em base64 (permite abrir sem servidor).
+- `sound.js` — motor de áudio chiptune (efeitos e música, Web Audio API).
 - `assets/rex.png`, `assets/lima.png` — sprites originais recortados da foto.
 - `icon-*.png`, `manifest.webmanifest` — ícone e configuração de app (PWA/iPhone).

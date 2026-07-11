@@ -17,6 +17,12 @@
   const $power = document.getElementById("power");
   const $powerBox = document.getElementById("powerBox");
   const $btnFire = document.getElementById("btnFire");
+  const $muteBtn = document.getElementById("muteBtn");
+
+  // Atalhos de áudio (tolerantes à ausência do motor de som)
+  const snd = (n) => { if (window.Sound) window.Sound.play(n); };
+  const musicStart = () => { if (window.Sound) window.Sound.startMusic(); };
+  const musicStop  = () => { if (window.Sound) window.Sound.stopMusic(); };
 
   // ---- Screens ----
   const startScreen = document.getElementById("startScreen");
@@ -133,6 +139,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
   let levelIdx = 0;
   let score = 0, lives = 3;
   let infinite = false;          // modo vidas infinitas
+  let audioMuted = false;        // som ligado/desligado
   const START_LIVES = 3;
   const SAVE_KEY = "sapobros_save_v1";
   let solids = [];   // {x,y,w,h}
@@ -174,6 +181,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     if (e.key === "ArrowUp" || e.key === " ") { if (!keys.jumpHeld) keys.jump = true; keys.jumpHeld = true; }
     const k = e.key.toLowerCase();
     if (k === "f" || k === "x") { if (!e.repeat) keys.fire = true; }
+    if (k === "m") { if (!e.repeat) toggleMute(); }
   });
   addEventListener("keyup", e => {
     if (e.key === "ArrowLeft") keys.left = false;
@@ -258,7 +266,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     const inProgress = (state === "play" || state === "dead" || state === "levelend");
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({
-        chosen, infinite,                 // preferências (sempre)
+        chosen, infinite, muted: audioMuted,   // preferências (sempre)
         inProgress,                       // há um jogo em andamento?
         levelIdx, score, lives: isFinite(lives) ? lives : START_LIVES,
         power: player.power,              // poder atual (cogumelo/fogo/voo)
@@ -306,6 +314,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     state = "play";
     updateHUD();
     saveProgress();
+    if (window.Sound) { window.Sound.resume(); musicStart(); }
   }
 
   function showMsg(title, text, btn) {
@@ -317,6 +326,8 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
   function nextLevel() {
     levelIdx++;
+    musicStop();
+    snd("levelclear");
     if (levelIdx >= LEVELS.length) {
       state = "win";
       saveProgress();   // guarda preferências, marca jogo como concluído (sem "continuar")
@@ -332,6 +343,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     if (infinite) {          // vidas infinitas: apenas renasce
       respawnPlayer(true);
       state = "play";
+      musicStart();
       return;
     }
     lives--;
@@ -339,11 +351,14 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     if (lives <= 0) {
       state = "gameover";
       saveProgress();        // fim de jogo: mantém preferências, encerra o progresso
+      musicStop();
+      snd("gameover");
       showMsg("💀 Fim de jogo", `Que pena! Pontuação: ${score} 🍎. Tente novamente.`, "🔁 Recomeçar");
     } else {
       respawnPlayer(true);
       state = "play";
       saveProgress();
+      musicStart();          // volta a música ao renascer
     }
   }
 
@@ -387,6 +402,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
       p.vy = (p.power === "small") ? JUMP_VY : POWER_JUMP;
       p.onGround = false;
       spawnDust(p.x + p.w/2, p.y + p.h);
+      snd("jump");
     }
     keys.jump = false;
     // Variable jump height (não se aplica ao voo, que usa empuxo contínuo)
@@ -511,6 +527,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
           p.vy = JUMP_VY * 0.62;
           score += 100; updateHUD();
           spawnPop(e.x + e.w/2, e.y + e.h/2);
+          snd("stomp");
         } else if (p.invuln <= 0) {
           if (p.power !== "small") {
             // perde o poder em vez de morrer (estilo Mario)
@@ -519,6 +536,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
             p.vy = -6;
             spawnSpark(p.x + p.w/2, p.y + p.h/2);
             updateHUD();
+            snd("powerdown");
           } else {
             killPlayer();
           }
@@ -536,6 +554,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
         c.taken = true;
         score += 50; updateHUD();
         spawnSpark(c.x + c.w/2, c.y + c.h/2);
+        snd("coin");
       }
     }
   }
@@ -545,6 +564,8 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     player.dead = true;
     player.deadT = 0;
     player.vy = -9;
+    musicStop();
+    snd("die");
   }
 
   // ---- POWER-UPS ----
@@ -590,14 +611,16 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
   function collectPower(type) {
     const p = player;
     if (type === "mushroom") {
-      if (p.power === "small") setPower("big");
-      else score += 1000;         // já grande: vira pontos
+      if (p.power === "small") { setPower("big"); snd("powerup"); }
+      else { score += 1000; snd("oneup"); }   // já grande: vira pontos
     } else if (type === "fire") {
       setPower("fire");
       score += 200;
+      snd("powerup");
     } else if (type === "fly") {
       setPower("fly");
       score += 200;
+      snd("powerup");
     }
     updateHUD();
   }
@@ -612,6 +635,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
       y: p.y + p.h * 0.35,
       w: 12, h: 12, vx: dir * 6.2, vy: -1.5, dead: false
     });
+    snd("shoot");
   }
 
   function updateFireballs() {
@@ -640,6 +664,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
             e.alive = false; e.squash = 16;
             score += 150; updateHUD();
             spawnPop(e.x + e.w/2, e.y + e.h/2);
+            snd("kick");
             f.dead = true;
             break;
           }
@@ -1031,6 +1056,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     if (s) {
       chosen = s.chosen ?? chosen;
       infinite = !!s.infinite;
+      applyMute(!!s.muted);
     }
     infiniteChk.checked = infinite;
     charEls.forEach(e => e.classList.toggle("sel", parseInt(e.dataset.char, 10) === chosen));
@@ -1049,16 +1075,35 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     saveProgress();
   });
 
+  // ---- Botão de mudo (🔊 / 🔇) ----
+  function applyMute(m) {
+    audioMuted = m;
+    if (window.Sound) window.Sound.setMuted(m);
+    if ($muteBtn) {
+      $muteBtn.textContent = m ? "🔇" : "🔊";
+      $muteBtn.classList.toggle("off", m);
+    }
+    if (!m && state === "play") musicStart();
+    saveProgress();
+  }
+  function toggleMute() { if (window.Sound) window.Sound.resume(); applyMute(!audioMuted); }
+  if ($muteBtn) {
+    $muteBtn.addEventListener("click", toggleMute);
+    $muteBtn.addEventListener("touchstart", (e) => { e.preventDefault(); toggleMute(); }, { passive:false });
+  }
+
   msgBtn.addEventListener("click", () => {
     if (state === "levelend") {
       loadLevel(levelIdx);
       msgScreen.classList.add("hidden");
       state = "play";
       updateHUD();
+      musicStart();
     } else if (state === "win" || state === "gameover") {
       msgScreen.classList.add("hidden");
       startScreen.classList.remove("hidden");
       state = "start";
+      musicStop();
       refreshStartScreen();
     }
   });
