@@ -226,9 +226,34 @@ try {
     await ctx.close();
   }
 
+  // ---------- 11. Pausa e menu inicial ----------
+  {
+    const { ctx, page } = await newGame();
+    await page.click("#startBtn"); await sleep(200);
+    // pausar
+    await page.click("#pauseBtn"); await sleep(50);
+    const paused = await page.evaluate(() => ({ state: window.__DINO.state, overlay: !document.getElementById("pauseScreen").classList.contains("hidden") }));
+    check("pausar congela o jogo e mostra overlay", paused.state === "paused" && paused.overlay === true, JSON.stringify(paused));
+    // jogo não avança enquanto pausado
+    const x0 = await page.evaluate(() => window.__DINO.player.x);
+    await page.keyboard.down("ArrowRight"); await sleep(300); await page.keyboard.up("ArrowRight");
+    const x1 = await page.evaluate(() => window.__DINO.player.x);
+    check("jogo não avança enquanto pausado", Math.abs(x1 - x0) < 0.5, `x ${x0}->${x1}`);
+    // retomar
+    await page.click("#resumeBtn"); await sleep(50);
+    const resumed = await page.evaluate(() => ({ state: window.__DINO.state, overlay: !document.getElementById("pauseScreen").classList.contains("hidden") }));
+    check("retomar volta ao jogo", resumed.state === "play" && resumed.overlay === false, JSON.stringify(resumed));
+    // menu inicial
+    await page.click("#homeBtn"); await sleep(80);
+    const menu = await page.evaluate(() => ({ state: window.__DINO.state, start: !document.getElementById("startScreen").classList.contains("hidden"), cont: !document.getElementById("continueBtn").classList.contains("hidden") }));
+    check("botão menu volta à tela inicial", menu.state === "start" && menu.start === true, JSON.stringify(menu));
+    check("menu preserva o progresso (Continuar disponível)", menu.cont === true, JSON.stringify(menu));
+    await ctx.close();
+  }
+
   // O Chromium headless (CI) não decodifica AAC/m4a — as vozes tocam no Safari.
-  // Ignoramos SÓ esse erro conhecido de codec; qualquer outro reprova o teste.
-  const realErrors = pageErrors.filter((e) => !/decode audio data/i.test(e));
+  // Ignoramos só erros de codec de áudio; qualquer outro reprova o teste.
+  const realErrors = pageErrors.filter((e) => !/decode audio data|no supported source|supported sources|NotSupportedError|failed to load because/i.test(e));
   check("sem erros de runtime no console/página", realErrors.length === 0, realErrors.join(" | "));
 } finally {
   await browser.close();

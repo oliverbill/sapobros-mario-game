@@ -33,6 +33,11 @@
   const msgBtn      = document.getElementById("msgBtn");
   const startBtn    = document.getElementById("startBtn");
   const touchLayer  = document.getElementById("touch");
+  const pauseScreen = document.getElementById("pauseScreen");
+  const resumeBtn   = document.getElementById("resumeBtn");
+  const menuBtn     = document.getElementById("menuBtn");
+  const pauseBtn    = document.getElementById("pauseBtn");
+  const homeBtn     = document.getElementById("homeBtn");
 
   // ============================================================
   //  CHARACTERS
@@ -183,6 +188,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     const k = e.key.toLowerCase();
     if (k === "f" || k === "x") { if (!e.repeat) keys.fire = true; }
     if (k === "m") { if (!e.repeat) toggleMute(); }
+    if (k === "p" || e.key === "Escape") { if (!e.repeat) togglePause(); }
   });
   addEventListener("keyup", e => {
     if (e.key === "ArrowLeft") keys.left = false;
@@ -264,7 +270,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
   //  SAVE / LOAD  (localStorage)
   // ============================================================
   function saveProgress() {
-    const inProgress = (state === "play" || state === "dead" || state === "levelend");
+    const inProgress = (state === "play" || state === "dead" || state === "levelend" || state === "paused");
     try {
       localStorage.setItem(SAVE_KEY, JSON.stringify({
         chosen, infinite, muted: audioMuted,   // preferências (sempre)
@@ -323,6 +329,31 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     msgText.textContent = text;
     msgBtn.textContent = btn;
     msgScreen.classList.remove("hidden");
+  }
+
+  // Pausa/retoma o jogo (só faz sentido durante a partida)
+  function togglePause() {
+    if (state === "play") {
+      state = "paused";
+      musicStop();
+      pauseScreen.classList.remove("hidden");
+    } else if (state === "paused") {
+      state = "play";
+      pauseScreen.classList.add("hidden");
+      musicStart();
+    }
+  }
+
+  // Volta ao menu inicial, salvando o progresso (Continuar fica disponível)
+  function goToMenu() {
+    if (state !== "play" && state !== "paused") return;
+    saveProgress();               // com inProgress=true (estado ainda é play/paused)
+    musicStop();
+    state = "start";
+    pauseScreen.classList.add("hidden");
+    msgScreen.classList.add("hidden");
+    startScreen.classList.remove("hidden");
+    refreshStartScreen();
   }
 
   function nextLevel() {
@@ -992,7 +1023,7 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     drawEnemies();
     drawFireballs();
     drawParticles();
-    if (state === "play" || state === "dead") {
+    if (state === "play" || state === "dead" || state === "paused") {
       // pisca durante a invulnerabilidade
       const blink = player.invuln > 0 && (Math.floor(tick / 4) % 2 === 0);
       if (!blink) {
@@ -1096,6 +1127,17 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     $muteBtn.addEventListener("click", toggleMute);
     $muteBtn.addEventListener("touchstart", (e) => { e.preventDefault(); toggleMute(); }, { passive:false });
   }
+
+  // ---- Botões de pausa e menu inicial ----
+  function bindTap(el, fn) {
+    if (!el) return;
+    el.addEventListener("click", fn);
+    el.addEventListener("touchstart", (e) => { e.preventDefault(); fn(); }, { passive:false });
+  }
+  bindTap(pauseBtn, togglePause);
+  bindTap(homeBtn, goToMenu);
+  bindTap(resumeBtn, () => { if (state === "paused") togglePause(); });
+  bindTap(menuBtn, goToMenu);
 
   msgBtn.addEventListener("click", () => {
     if (state === "levelend") {

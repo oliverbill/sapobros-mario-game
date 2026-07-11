@@ -63,7 +63,7 @@
     pointer-events:none;
   }
   #hud .box { background:rgba(0,0,0,.28); padding:5px 12px; border-radius:8px; }
-  #muteBtn { pointer-events:auto; cursor:pointer; user-select:none; }
+  #hud .ctrl { pointer-events:auto; cursor:pointer; user-select:none; }
   #muteBtn.off { opacity:.55; }
   /* Touch controls — centralizados verticalmente nas laterais (bom p/ paisagem)
      e respeitando a área segura do iPhone (notch/home indicator). */
@@ -109,7 +109,9 @@
     <span class="box">Fase <span id="level">1</span></span>
     <span class="box" id="powerBox">Poder <span id="power">—</span></span>
     <span class="box">❤ <span id="lives">3</span></span>
-    <span class="box" id="muteBtn" title="Ligar/desligar som (M)">🔊</span>
+    <span class="box ctrl" id="pauseBtn" title="Pausar (P)">⏸</span>
+    <span class="box ctrl" id="homeBtn" title="Menu inicial">🏠</span>
+    <span class="box ctrl" id="muteBtn" title="Ligar/desligar som (M)">🔊</span>
   </div>
 
   <!-- Start / character select -->
@@ -146,6 +148,15 @@
     <button class="btn" id="msgBtn">▶ Continuar</button>
   </div>
 
+  <!-- Pause overlay -->
+  <div id="pauseScreen" class="overlay hidden">
+    <h1>⏸ Pausado</h1>
+    <div class="btnRow">
+      <button class="btn" id="resumeBtn">▶ Continuar</button>
+      <button class="btn" id="menuBtn">🏠 Menu inicial</button>
+    </div>
+  </div>
+
   <!-- Touch controls -->
   <div id="touch">
     <div class="pad left">
@@ -160,9 +171,9 @@
 </div>
 
 <!-- ?v= força o navegador a baixar a versão nova (evita cache antigo). Bumpe ao atualizar. -->
-<script src="assets.js?v=9"></script>
-<script src="voices.js?v=9"></script>
-<script src="sound.js?v=9"></script>
-<script src="game.js?v=9"></script>
+<script src="assets.js?v=10"></script>
+<script src="voices.js?v=10"></script>
+<script src="sound.js?v=10"></script>
+<script src="game.js?v=10"></script>
 </body>
 </html>
