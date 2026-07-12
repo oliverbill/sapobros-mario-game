@@ -607,6 +607,31 @@ try {
     await ctx.close();
   }
 
+  // ---------- 21. Tijolos não podem formar teto sobre um buraco ----------
+  {
+    const { ctx, page } = await newGame();
+    await page.click("#startBtn"); await sleep(120);
+    const bad = await page.evaluate(async () => {
+      const T = 40, problems = [];
+      for (let i = 0; i < 20; i++) {
+        if (i % 4 === 3) continue;                     // pula arenas de chefão
+        window.__DINO.enterLevel(i);
+        await new Promise(r => setTimeout(r, 20));
+        const solids = window.__DINO.solids();
+        const grounds = solids.filter(s => s.type === "ground");
+        if (!grounds.length) continue;
+        const groundY = Math.max(...grounds.map(s => s.y));
+        const groundAt = (x) => grounds.some(s => s.y === groundY && x >= s.x && x < s.x + s.w);
+        for (const b of solids.filter(s => s.type === "brick")) {
+          if (b.y <= groundY - 2 * T && !groundAt(b.x + T / 2)) problems.push(`L${i}@${b.x / T | 0},${b.y / T | 0}`);
+        }
+      }
+      return problems;
+    });
+    check("nenhum tijolo forma teto sobre um buraco", bad.length === 0, bad.slice(0, 8).join("; "));
+    await ctx.close();
+  }
+
   // O Chromium headless (CI) não decodifica AAC/m4a — as vozes tocam no Safari.
   // Ignoramos só erros de codec de áudio; qualquer outro reprova o teste.
   const realErrors = pageErrors.filter((e) => !/decode audio data|no supported source|supported sources|NotSupportedError|failed to load because/i.test(e));
