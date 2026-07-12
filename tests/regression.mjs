@@ -411,6 +411,31 @@ try {
       suck: (() => { try { window.Sound.play("suck"); return true; } catch (e) { return false; } })(),
     }));
     check("música de terror + som de sucção disponíveis", audio.horror && audio.suck, JSON.stringify(audio));
+
+    // nenhuma moeda pode ficar presa entre blocos (sólido logo acima e logo abaixo)
+    const trapped = await page.evaluate(() => {
+      const solids = window.__DINO.solids(), coins = window.__DINO.coins();
+      const solidAt = (x, y) => solids.some(s => x > s.x && x < s.x + s.w && y > s.y && y < s.y + s.h);
+      return coins.filter(c => {
+        const cx = c.x + c.w / 2;
+        return solidAt(cx, c.y - 6) && solidAt(cx, c.y + c.h + 6);   // preso acima E abaixo
+      }).length;
+    });
+    check("nenhuma moeda presa entre blocos", trapped === 0, `presas: ${trapped}`);
+
+    // ciclo do cano: sair do subterrâneo volta à fase principal (não re-suga)
+    const round = await page.evaluate(async () => {
+      const entryX = window.__DINO.pipes()[0] ? window.__DINO.pipes()[0].x : 0;   // já no subterrâneo -> pipes vazio
+      const pl = window.__DINO.player;
+      const exit = window.__DINO.solids().find(s => s.type === "pipe");
+      pl.x = exit.x - pl.w - 2; pl.y = exit.y + exit.h - pl.h - 2;
+      // segura "down" por vários quadros (simula o jogador saindo)
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+      for (let i = 0; i < 40; i++) await new Promise(r => setTimeout(r, 20));
+      window.dispatchEvent(new KeyboardEvent("keyup", { key: "ArrowDown" }));
+      return { under: window.__DINO.underground, lw: window.__DINO.levelW };
+    });
+    check("sair do cano volta à fase principal (sem re-sugar)", round.under === false && round.lw !== inCave.lw, JSON.stringify(round));
     await ctx.close();
   }
 

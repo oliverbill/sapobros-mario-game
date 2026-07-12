@@ -161,13 +161,13 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
   const UNDERGROUND_MAP =
 `GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 G......................................................................G
-G...........b..........................................................G
-G...............b.............................b.................b......G
-G.......................????..b...................b.....????...........G
-G.......................BBBB............................BBBBb..........G
-G.......????............................????............????...........G
-G.......BBBB............BBBB............BBBB............BBBB...........G
-G.P...?.......?.......?...........?...........?.......?.......?.....X..G
+G...................b..................................................G
+G.............b.........................b.................b............G
+G...........................b...................................b......G
+G...................................................b..................G
+G........????...??....????...??....????...??....????...??...????.......G
+G........BBBB.........BBBB.........BBBB.........BBBB........BBBB.......G
+G.P..?............?............?............?............?..........X..G
 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
 
 
@@ -199,6 +199,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   let cameraX = 0;
   let particles = [];
   let tick = 0;               // contador global de quadros (animação/piscar)
+  let pipeCd = 0;             // recarga após entrar/sair de cano (evita re-entrar na hora)
 
   const player = {
     x:0, y:0, w:30, h:38, vx:0, vy:0,
@@ -494,6 +495,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     const retY = pipe.y - player.h;
     snd("suck");                        // som de cano sugando
     loadUnderground(levelIdx, retX, retY);
+    pipeCd = 30;                        // trava re-entrada/saída por um instante
     state = "play";
     updateHUD();
   }
@@ -507,6 +509,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     player.x = ret.x; player.y = ret.y;
     player.vx = 0; player.vy = 0;
     player.safeX = ret.x; player.safeY = ret.y;
+    pipeCd = 30;                        // evita ser sugado de volta ao aparecer no cano
     state = "play";
     updateHUD();
     musicStart();
@@ -687,6 +690,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     updateFireballs();
     updateParticles();
     for (const s of solids) if (s.bump > 0) s.bump--;   // animação da cabeçada no "?"
+    if (pipeCd > 0) pipeCd--;                            // recarga do cano
 
     // Encostou no mastro da bandeira -> inicia a descida
     if (flag && !flagAnim && rectsOverlap(p, flag)) {
@@ -695,7 +699,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     }
 
     // Entrar no cano gigante (seta para baixo em cima da boca do cano)
-    if (keys.down && p.onGround) {
+    if (keys.down && p.onGround && pipeCd <= 0) {
       for (const pipe of pipes) {
         const mouth = pipe.x + pipe.w / 2;
         if (Math.abs((p.x + p.w/2) - mouth) < TILE * 0.6 && Math.abs((p.y + p.h) - pipe.y) < 6) {
@@ -706,7 +710,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     }
     // Sair do subterrâneo pelo cano de saída: basta chegar perto e apertar ↓
     // (o cano fica no chão, então não exige subir em cima).
-    if (underground && exitPipe && keys.down && p.onGround) {
+    if (underground && exitPipe && keys.down && p.onGround && pipeCd <= 0) {
       const mouth = exitPipe.x + exitPipe.w / 2;
       if (Math.abs((p.x + p.w/2) - mouth) < TILE) {
         exitUnderground();
