@@ -2236,39 +2236,62 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   }
 
   // ---------- MAPA DE FASES (overworld) ----------
-  // 15 nós em serpentina (3 fileiras de 5), agrupados em 5 mundos (temas)
+  // 20 nós formando uma TRILHA sinuosa (serpenteia entre as montanhas),
+  // agrupados em 5 mundos (3 fases + 1 chefão cada).
   const MAP_NODES = (() => {
-    const nodes = [], perRow = 5, ys = [104, 196, 288, 380], x0 = 78, x1 = 722;
+    const nodes = [], perRow = 5, ys = [108, 200, 292, 384], x0 = 82, x1 = 718, wig = 30;
     for (let r = 0; r < 4; r++) for (let k = 0; k < perRow; k++) {
       const idx = r * perRow + k;
-      const kk = (r % 2 === 0) ? k : (perRow - 1 - k);
-      nodes.push({ x: x0 + (x1 - x0) * (kk / (perRow - 1)), y: ys[r], world: worldOf(idx), boss: stageIsBoss(idx) });
+      const kk = (r % 2 === 0) ? k : (perRow - 1 - k);      // serpentina (vai e volta)
+      const t = kk / (perRow - 1);
+      // ondula na vertical e desloca um pouco na horizontal → curva de trilha
+      const x = x0 + (x1 - x0) * t + Math.sin(kk * 1.7 + r * 2.1) * 16;
+      const y = ys[r] + Math.sin(kk * 1.15 + r * 1.6) * wig;
+      nodes.push({ x, y, world: worldOf(idx), boss: stageIsBoss(idx) });
     }
     return nodes;
   })();
+  // Traça uma curva suave passando pelos nós (pontos médios com quadráticas)
+  function traceTrail(pts, count) {
+    const N = (count == null ? pts.length : count);
+    if (N < 1) return;
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < N - 1; i++) {
+      const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
+      ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+    }
+    if (N >= 2) ctx.lineTo(pts[N - 1].x, pts[N - 1].y);
+  }
   const WORLD_COLOR = ["#5fa83d", "#2f9a58", "#e0b866", "#8a6ad6", "#7fb8ff"];  // por tema
   const WORLD_NAME  = ["🌳 Bosque", "🌴 Selva", "🏖️ Praia", "🏰 Castelo", "☁️ Céu"];
 
-  // Decorações do mapa: posições fixas escolhidas nos "vãos" da grade de nós
-  // (nós ficam em y=120/235/350; a decoração usa y=82/177/292/400 e fica longe
-  //  do caminho). Arte 100% original desenhada abaixo.
+  // Decorações do mapa. As MONTANHAS são desenhadas atrás da trilha (que
+  // serpenteia no meio delas); o resto preenche os vãos. Arte 100% original.
   const MAP_DECOR = [
-    { t: "mtn",   x: 150, y: 84,  s: 1.0 },
-    { t: "mtn",   x: 470, y: 82,  s: 1.25 },
-    { t: "tree",  x: 320, y: 80,  s: 0.9 },
-    { t: "tree2", x: 645, y: 82,  s: 1.0 },
-    { t: "tree",  x: 78,  y: 177, s: 1.0 },
-    { t: "tree2", x: 239, y: 177, s: 1.1 },
-    { t: "pond",  x: 400, y: 182, s: 1.0 },
-    { t: "tree",  x: 561, y: 177, s: 1.0 },
-    { t: "bush",  x: 239, y: 294, s: 1.0 },
-    { t: "tree2", x: 400, y: 292, s: 1.0 },
-    { t: "castle",x: 561, y: 298, s: 1.0 },
-    { t: "tree",  x: 722, y: 292, s: 1.0 },
-    { t: "palm",  x: 150, y: 402, s: 1.0 },
-    { t: "bush",  x: 320, y: 404, s: 1.0 },
-    { t: "bush",  x: 480, y: 404, s: 1.0 },
-    { t: "palm",  x: 645, y: 402, s: 1.0 },
+    // cordilheira do topo
+    { t: "mtn",   x: 128, y: 96,  s: 1.15 },
+    { t: "mtn",   x: 300, y: 88,  s: 1.35 },
+    { t: "mtn",   x: 470, y: 92,  s: 1.2 },
+    { t: "mtn",   x: 636, y: 90,  s: 1.3 },
+    // montanhas entre as fileiras (a trilha passa entre elas)
+    { t: "mtn",   x: 205, y: 168, s: 1.0 },
+    { t: "mtn",   x: 396, y: 158, s: 1.25 },
+    { t: "mtn",   x: 585, y: 166, s: 1.05 },
+    { t: "mtn",   x: 118, y: 252, s: 1.1 },
+    { t: "mtn",   x: 500, y: 250, s: 1.15 },
+    { t: "mtn",   x: 690, y: 256, s: 1.0 },
+    { t: "mtn",   x: 260, y: 346, s: 1.05 },
+    { t: "mtn",   x: 452, y: 344, s: 1.2 },
+    // vegetação e marcos nos cantos livres
+    { t: "tree",  x: 78,  y: 150, s: 1.0 },
+    { t: "tree2", x: 700, y: 150, s: 1.0 },
+    { t: "pond",  x: 360, y: 240, s: 1.0 },
+    { t: "castle",x: 636, y: 336, s: 1.0 },
+    { t: "tree",  x: 96,  y: 336, s: 1.0 },
+    { t: "bush",  x: 330, y: 408, s: 1.0 },
+    { t: "palm",  x: 150, y: 410, s: 1.0 },
+    { t: "palm",  x: 600, y: 410, s: 1.0 },
+    { t: "bush",  x: 720, y: 402, s: 1.0 },
   ];
 
   // Forma orgânica fechada (litoral irregular) centrada em (cx,cy)
@@ -2387,33 +2410,35 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     // --- continente (praia + grama) ---
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
-    ctx.fillStyle = "#ecd79a"; mapBlob(400, 236, 366, 168, 0.045, 0.6); ctx.fill();   // areia/litoral
+    ctx.fillStyle = "#ecd79a"; mapBlob(400, 242, 372, 182, 0.045, 0.6); ctx.fill();   // areia/litoral
     ctx.restore();
-    ctx.fillStyle = "#6fae54"; mapBlob(400, 236, 344, 150, 0.05, 0.6); ctx.fill();    // grama
-    ctx.fillStyle = "rgba(255,255,255,.08)"; mapBlob(400, 222, 320, 128, 0.05, 0.6); ctx.fill(); // luz no topo
+    ctx.fillStyle = "#6fae54"; mapBlob(400, 242, 350, 165, 0.05, 0.6); ctx.fill();    // grama
+    ctx.fillStyle = "rgba(255,255,255,.08)"; mapBlob(400, 228, 326, 140, 0.05, 0.6); ctx.fill(); // luz no topo
 
-    // --- caminho ligando os nós (com contorno) ---
+    // --- montanhas ao fundo (a trilha passa no meio delas) ---
+    for (const d of MAP_DECOR) {
+      if (d.t !== "mtn") continue;
+      if (MAP_NODES.some(n => Math.hypot(n.x - d.x, n.y - d.y) < 30)) continue;
+      mapMountain(d.x, d.y, d.s);
+    }
+
+    // --- trilha sinuosa ligando os nós (curva suave, com contorno) ---
     ctx.lineJoin = "round"; ctx.lineCap = "round";
     ctx.strokeStyle = "rgba(120,86,30,.55)"; ctx.lineWidth = 15;
-    ctx.beginPath(); ctx.moveTo(MAP_NODES[0].x, MAP_NODES[0].y);
-    for (let i = 1; i < MAP_NODES.length; i++) ctx.lineTo(MAP_NODES[i].x, MAP_NODES[i].y);
-    ctx.stroke();
+    traceTrail(MAP_NODES); ctx.stroke();
     ctx.strokeStyle = "#efdca6"; ctx.lineWidth = 10; ctx.stroke();
     // trecho já concluído em tom mais quente
     if (unlocked > 0) {
       ctx.strokeStyle = "#ffcf5a"; ctx.lineWidth = 10;
-      ctx.beginPath(); ctx.moveTo(MAP_NODES[0].x, MAP_NODES[0].y);
-      for (let i = 1; i <= Math.min(unlocked, MAP_NODES.length - 1); i++) ctx.lineTo(MAP_NODES[i].x, MAP_NODES[i].y);
-      ctx.stroke();
+      traceTrail(MAP_NODES, Math.min(unlocked, MAP_NODES.length - 1) + 1); ctx.stroke();
     }
     // pontilhado central
     ctx.strokeStyle = "rgba(150,110,40,.5)"; ctx.lineWidth = 2; ctx.setLineDash([2, 12]);
-    ctx.beginPath(); ctx.moveTo(MAP_NODES[0].x, MAP_NODES[0].y);
-    for (let i = 1; i < MAP_NODES.length; i++) ctx.lineTo(MAP_NODES[i].x, MAP_NODES[i].y);
-    ctx.stroke(); ctx.setLineDash([]);
+    traceTrail(MAP_NODES); ctx.stroke(); ctx.setLineDash([]);
 
-    // --- decorações --- (pula as que ficariam sobre um nó)
+    // --- demais decorações --- (pula as que ficariam sobre um nó)
     for (const d of MAP_DECOR) {
+      if (d.t === "mtn") continue;   // montanhas já desenhadas atrás da trilha
       if (MAP_NODES.some(n => Math.hypot(n.x - d.x, n.y - d.y) < 44)) continue;
       if (d.t === "tree")   mapTree(d.x, d.y, d.s, false);
       else if (d.t === "tree2") mapTree(d.x, d.y, d.s, true);
