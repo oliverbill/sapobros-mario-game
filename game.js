@@ -2239,18 +2239,42 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   // 20 nós formando uma TRILHA sinuosa (serpenteia entre as montanhas),
   // agrupados em 5 mundos (3 fases + 1 chefão cada).
   const MAP_NODES = (() => {
-    const nodes = [], perRow = 5, ys = [108, 200, 292, 384], x0 = 82, x1 = 718, wig = 30;
+    const nodes = [], perRow = 5, ys = [112, 201, 290, 374], x0 = 84, x1 = 716;
     for (let r = 0; r < 4; r++) for (let k = 0; k < perRow; k++) {
       const idx = r * perRow + k;
       const kk = (r % 2 === 0) ? k : (perRow - 1 - k);      // serpentina (vai e volta)
       const t = kk / (perRow - 1);
-      // ondula na vertical e desloca um pouco na horizontal → curva de trilha
-      const x = x0 + (x1 - x0) * t + Math.sin(kk * 1.7 + r * 2.1) * 16;
-      const y = ys[r] + Math.sin(kk * 1.15 + r * 1.6) * wig;
+      // duas senoides somadas → curva bem sinuosa e pouco previsível
+      const x = x0 + (x1 - x0) * t + Math.sin(kk * 1.7 + r * 2.1) * 22 + Math.sin(kk * 3.1 + r) * 9;
+      const y = ys[r] + Math.sin(kk * 1.2 + r * 1.7) * 26 + Math.sin(kk * 2.6 + r * 0.6) * 12;
       nodes.push({ x, y, world: worldOf(idx), boss: stageIsBoss(idx) });
     }
     return nodes;
   })();
+  // Segmentos (entre nó i e i+1) que atravessam água por uma ponte
+  const BRIDGE_SEGS = [1, 6, 12, 17];
+  function drawChannel(a, b) {   // canal d'água cruzando por baixo da ponte
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, ang = Math.atan2(b.y - a.y, b.x - a.x) + Math.PI / 2;
+    ctx.save(); ctx.translate(mx, my); ctx.rotate(ang);
+    ctx.fillStyle = "#3f97da"; ctx.beginPath(); ctx.ellipse(0, 0, 62, 27, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = "#5aa9e6"; ctx.beginPath(); ctx.ellipse(0, 0, 62, 27, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.28)"; ctx.beginPath(); ctx.ellipse(-12, -7, 20, 5, 0.3, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+  function drawBridge(a, b) {     // ponte de madeira com corrimão
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx), w = 15;
+    ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(ang);
+    ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(0, w - 1, len, 5);       // sombra
+    ctx.fillStyle = "#b9822f";
+    const n = Math.max(5, Math.floor(len / 9));
+    for (let i = 0; i <= n; i++) { const px = len * (i / n); ctx.fillRect(px - 3, -w, 6, w * 2); }  // tábuas
+    ctx.fillStyle = "#8a5a24"; ctx.fillRect(0, -w, len, 3); ctx.fillRect(0, w - 3, len, 3);          // travessas
+    ctx.strokeStyle = "#caa06a"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, -w - 4); ctx.lineTo(len, -w - 4); ctx.moveTo(0, w + 4); ctx.lineTo(len, w + 4); ctx.stroke();
+    ctx.fillStyle = "#6e4c22";
+    for (const p of [0.16, 0.5, 0.84]) { const px = len * p; ctx.fillRect(px - 1.5, -w - 6, 3, 6); ctx.fillRect(px - 1.5, w, 3, 6); }
+    ctx.restore();
+  }
   // Traça uma curva suave passando pelos nós (pontos médios com quadráticas)
   function traceTrail(pts, count) {
     const N = (count == null ? pts.length : count);
@@ -2410,10 +2434,13 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     // --- continente (praia + grama) ---
     ctx.save();
     ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
-    ctx.fillStyle = "#ecd79a"; mapBlob(400, 242, 372, 182, 0.045, 0.6); ctx.fill();   // areia/litoral
+    ctx.fillStyle = "#ecd79a"; mapBlob(400, 244, 374, 188, 0.045, 0.6); ctx.fill();   // areia/litoral
     ctx.restore();
-    ctx.fillStyle = "#6fae54"; mapBlob(400, 242, 350, 165, 0.05, 0.6); ctx.fill();    // grama
-    ctx.fillStyle = "rgba(255,255,255,.08)"; mapBlob(400, 228, 326, 140, 0.05, 0.6); ctx.fill(); // luz no topo
+    ctx.fillStyle = "#6fae54"; mapBlob(400, 244, 352, 172, 0.05, 0.6); ctx.fill();    // grama
+    ctx.fillStyle = "rgba(255,255,255,.08)"; mapBlob(400, 230, 328, 146, 0.05, 0.6); ctx.fill(); // luz no topo
+
+    // --- canais d'água sob as pontes (desenhados na grama) ---
+    for (const i of BRIDGE_SEGS) if (MAP_NODES[i + 1]) drawChannel(MAP_NODES[i], MAP_NODES[i + 1]);
 
     // --- montanhas ao fundo (a trilha passa no meio delas) ---
     for (const d of MAP_DECOR) {
@@ -2435,6 +2462,9 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     // pontilhado central
     ctx.strokeStyle = "rgba(150,110,40,.5)"; ctx.lineWidth = 2; ctx.setLineDash([2, 12]);
     traceTrail(MAP_NODES); ctx.stroke(); ctx.setLineDash([]);
+
+    // --- pontes de madeira sobre os canais ---
+    for (const i of BRIDGE_SEGS) if (MAP_NODES[i + 1]) drawBridge(MAP_NODES[i], MAP_NODES[i + 1]);
 
     // --- demais decorações --- (pula as que ficariam sobre um nó)
     for (const d of MAP_DECOR) {
