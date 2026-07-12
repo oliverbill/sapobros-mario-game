@@ -295,6 +295,20 @@ try {
     await ctx.close();
   }
 
+  // ---------- 13. Morte do Jones dispara a voz sem erro ----------
+  {
+    const { ctx, page } = await newGame();
+    await page.click("#startBtn"); await sleep(200);   // Jones é o padrão (char 0)
+    const r = await page.evaluate(async () => {
+      const pl = window.__DINO.player;
+      pl.y = window.__DINO.levelH + 200;               // cai no buraco -> morre
+      await new Promise(r => setTimeout(r, 200));
+      return { dead: pl.dead, hasJones: window.Sound.hasVoice("jones") };
+    });
+    check("Jones morre e a voz de morte está disponível", r.dead === true && r.hasJones === true, JSON.stringify(r));
+    await ctx.close();
+  }
+
   // O Chromium headless (CI) não decodifica AAC/m4a — as vozes tocam no Safari.
   // Ignoramos só erros de codec de áudio; qualquer outro reprova o teste.
   const realErrors = pageErrors.filter((e) => !/decode audio data|no supported source|supported sources|NotSupportedError|failed to load because/i.test(e));

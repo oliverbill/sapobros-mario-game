@@ -614,6 +614,8 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     player.vy = -9;
     musicStop();
     snd("die");
+    // voz do Jones ao morrer (reusa o clipe de voz do Jones)
+    if (chosen === 0) voice("jones");
   }
 
   // ---- POWER-UPS ----
