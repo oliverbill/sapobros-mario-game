@@ -142,10 +142,12 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
   }
 
   // Blocos "?" por fase: soltam um item quando o jogador dá uma cabeçada por baixo.
+  // Posições validadas: bloco flutuando com espaço vazio embaixo (acessível
+  // por cabeçada). Nunca colocar sobre outro bloco (ficaria inacessível).
   const QBLOCKS_BY_LEVEL = [
-    [ {col:14, row:5, item:"mushroom"}, {col:44, row:5, item:"fire"} ],
-    [ {col:20, row:5, item:"mushroom"}, {col:52, row:4, item:"fly"} ],
-    [ {col:16, row:4, item:"mushroom"}, {col:48, row:5, item:"fire"} ],
+    [ {col:8,  row:6, item:"mushroom"}, {col:52, row:6, item:"fire"} ],
+    [ {col:10, row:5, item:"mushroom"}, {col:52, row:5, item:"fly"} ],
+    [ {col:14, row:5, item:"mushroom"}, {col:53, row:5, item:"fire"} ],
   ];
   // Canos gigantes por fase: o jogador entra (seta para baixo) para o subterrâneo.
   const PIPES_BY_LEVEL = [
@@ -299,9 +301,15 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
       }
     }
     (POWERUPS_BY_LEVEL[idx] || []).forEach(pu => spawnPowerup(pu.type, pu.col * TILE, pu.row * TILE));
-    // blocos "?" (soltam item na cabeçada)
-    (QBLOCKS_BY_LEVEL[idx] || []).forEach(q =>
-      solids.push({ x:q.col*TILE, y:q.row*TILE, w:TILE, h:TILE, type:"question", item:q.item, used:false, bump:0 }));
+    // blocos "?" (soltam item na cabeçada). Proteção: nunca colocar sobre
+    // outro sólido (embaixo deve estar vazio, senão a cabeçada é impossível).
+    (QBLOCKS_BY_LEVEL[idx] || []).forEach(q => {
+      const bx = q.col * TILE, by = q.row * TILE;
+      const belowBlocked = solids.some(s =>
+        (bx + TILE/2) > s.x && (bx + TILE/2) < s.x + s.w && Math.abs(s.y - (by + TILE)) < 2);
+      if (belowBlocked) return;   // sem espaço embaixo -> ignora (inacessível)
+      solids.push({ x:bx, y:by, w:TILE, h:TILE, type:"question", item:q.item, used:false, bump:0 });
+    });
     // canos gigantes (2x2 tiles) que levam ao subterrâneo
     (PIPES_BY_LEVEL[idx] || []).forEach(p => {
       const px = p.col*TILE, py = p.row*TILE;

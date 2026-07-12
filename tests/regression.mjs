@@ -364,6 +364,14 @@ try {
     });
     check("bloco ? solta um item na cabeçada", r.after > r.before, JSON.stringify(r));
     check("bloco ? fica gasto após soltar", r.used === true, JSON.stringify(r));
+    // acessibilidade: nenhum bloco ? pode ter sólido logo abaixo (senão inacessível)
+    const blocked = await page.evaluate(() => {
+      const solids = window.__DINO.solids();
+      const qs = solids.filter(s => s.type === "question");
+      return qs.filter(q => solids.some(s =>
+        s !== q && (q.x + 20) > s.x && (q.x + 20) < s.x + s.w && Math.abs(s.y - (q.y + 40)) < 2)).length;
+    });
+    check("blocos ? não ficam sobre outros blocos (acessíveis)", blocked === 0, `bloqueados: ${blocked}`);
     await ctx.close();
   }
 
