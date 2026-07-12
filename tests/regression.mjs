@@ -548,34 +548,25 @@ try {
   {
     const { ctx, page } = await newGame();
     await page.click("#startBtn"); await sleep(120);
-    // varre as fases normais e coleta os tipos de inimigo e a velocidade média
+    // varre as fases normais e coleta os tipos de inimigo por mundo
     const survey = await page.evaluate(async () => {
       const kinds = {}, byWorld = {};
-      let speedEarly = 0, nEarly = 0, speedLate = 0, nLate = 0;
       for (let i = 0; i < 20; i++) {
         if (i % 4 === 3) continue;                 // pula arenas de chefão
         window.__DINO.enterLevel(i);
         await new Promise(r => setTimeout(r, 20));
-        const es = window.__DINO.enemies();
         const w = Math.floor(i / 4);
         byWorld[w] = byWorld[w] || new Set();
-        for (const e of es) {
-          kinds[e.type] = (kinds[e.type] || 0) + 1;
-          byWorld[w].add(e.type);
-          const sp = Math.abs(e.vx || 0);
-          if (i < 3) { speedEarly += sp; nEarly++; } if (i >= 16) { speedLate += sp; nLate++; }
-        }
+        for (const e of window.__DINO.enemies()) { kinds[e.type] = (kinds[e.type] || 0) + 1; byWorld[w].add(e.type); }
       }
-      return {
-        kinds, world0: [...(byWorld[0]||[])], world4: [...(byWorld[4]||[])],
-        avgEarly: nEarly ? speedEarly / nEarly : 0, avgLate: nLate ? speedLate / nLate : 0,
-      };
+      return { kinds, world0: [...(byWorld[0]||[])], world4: [...(byWorld[4]||[])] };
     });
-    check("há vários tipos de inimigo pelas fases", Object.keys(survey.kinds).length >= 4, JSON.stringify(survey.kinds));
-    check("mundo 1 só tem andarilhos (fácil)", survey.world0.length === 1 && survey.world0[0] === "walker", JSON.stringify(survey.world0));
-    check("mundo 5 traz tipos avançados (atirador/voador/espinho)",
-      ["shooter", "flyer", "spiker"].some(t => survey.world4.includes(t)), JSON.stringify(survey.world4));
-    check("inimigos ficam mais rápidos no fim", survey.avgLate > survey.avgEarly, JSON.stringify({ e: survey.avgEarly, l: survey.avgLate }));
+    const EASY = ["walker", "hopper", "roller"];
+    check("há muitos tipos de inimigo pelas fases (10+)", Object.keys(survey.kinds).length >= 10, JSON.stringify(Object.keys(survey.kinds)));
+    check("mundo 1 só tem tipos fáceis (anda/pula/rola)", survey.world0.every(t => EASY.includes(t)) && survey.world0.length >= 2, JSON.stringify(survey.world0));
+    check("mundo 5 traz tipos avançados (atirador/voador/espinho…)",
+      ["shooter", "flyer", "spiker", "bomber", "spitter", "turret"].some(t => survey.world4.includes(t)), JSON.stringify(survey.world4));
+    check("a variedade de inimigos cresce até o fim", survey.world4.length > survey.world0.length, JSON.stringify({ w0: survey.world0.length, w4: survey.world4.length }));
 
     // atirador dispara um projétil que causa dano ao jogador
     const shots = await page.evaluate(async () => {

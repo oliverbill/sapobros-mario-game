@@ -480,22 +480,50 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
 
   // Cria um inimigo com tipo/velocidade conforme a dificuldade da fase.
   // O elenco cresce por mundo: andarilho → pulador → atirador → voador → espinho.
+  // Elenco de inimigos por mundo (vai ganhando tipos e dificuldade).
+  // 16 tipos, cada um com um comportamento diferente (anda, pula, atira, voa…).
+  const ENEMY_BY_WORLD = [
+    ["walker", "hopper", "roller"],                    // mundo 1
+    ["jumper", "lobber", "splitter"],                  // mundo 2
+    ["shooter", "charger", "drifter"],                 // mundo 3
+    ["flyer", "diver", "zigzag", "turret"],            // mundo 4
+    ["spiker", "bomber", "spitter"],                   // mundo 5
+  ];
+  function enemyPool(stageIdx) {
+    let pool = [];
+    for (let i = 0; i <= worldOf(stageIdx); i++) pool = pool.concat(ENEMY_BY_WORLD[i]);
+    return pool;
+  }
   function makeEnemy(x, y, stageIdx) {
-    const w = worldOf(stageIdx);
-    const pool = ["walker"];
-    if (w >= 1) pool.push("jumper");
-    if (w >= 2) pool.push("shooter");
-    if (w >= 3) pool.push("flyer");
-    if (w >= 4) pool.push("spiker");
-    const type = pool[_enemyIdx++ % pool.length];
+    // Metade dos inimigos vem do mundo atual (garante que os tipos novos
+    // apareçam) e metade do acervo acumulado (variedade).
+    const full = enemyPool(stageIdx), cur = ENEMY_BY_WORLD[worldOf(stageIdx)];
+    const list = (_enemyIdx % 2 === 0) ? cur : full;
+    const type = list[_enemyIdx % list.length];
+    _enemyIdx++;
     const mul = 1 + stageIdx * 0.03;                 // fica mais rápido a cada fase
     const dir = Math.random() < 0.5 ? -1 : 1;
-    const base = { x:x+4, y:y+6, w:32, h:32, alive:true, squash:0, t:(_enemyIdx*17) % 60, type };
-    if (type === "jumper")  return { ...base, w:30, h:30, vx:dir*0.8*mul, jump:true, jumpEvery: Math.max(60, 120 - stageIdx*3) };
-    if (type === "shooter") return { ...base, vx:dir*0.5*mul, shoot:true, shootEvery: Math.max(60, 150 - stageIdx*5), shotSpeed: 3 + stageIdx*0.14, scd: 70 };
-    if (type === "flyer")   return { ...base, w:30, h:26, y:y+6 - TILE*2, baseY:y+6 - TILE*2, vx:dir*1.3*mul, vy:0, fly:true, ph:Math.random()*6.28, amp:24 };
-    if (type === "spiker")  return { ...base, w:32, h:30, vx:dir*0.8*mul, spiky:true };
-    return { ...base, vx:dir*0.9*mul };              // walker
+    const gy = y + 6;
+    const e = { x:x+4, y:gy, w:32, h:32, vx:0, vy:0, alive:true, squash:0, t:(_enemyIdx*17) % 60, type };
+    switch (type) {
+      case "walker":   e.vx = dir*0.9*mul; break;
+      case "hopper":   Object.assign(e, { w:28, h:28, vx:dir*0.7*mul, jump:true, jumpEvery: Math.max(34, 56 - stageIdx), jumpVy:-7 }); break;
+      case "roller":   Object.assign(e, { w:30, h:30, vx:dir*1.9*mul, roller:true }); break;
+      case "jumper":   Object.assign(e, { w:30, h:30, vx:dir*0.8*mul, jump:true, chase:true, jumpEvery: Math.max(56, 118 - stageIdx*3), jumpVy:-10 }); break;
+      case "lobber":   Object.assign(e, { w:34, h:30, lob:true, shootEvery: Math.max(66, 150 - stageIdx*4), scd:60 }); break;
+      case "splitter": Object.assign(e, { w:34, h:30, vx:dir*0.8*mul, split:true }); break;
+      case "shooter":  Object.assign(e, { vx:dir*0.5*mul, shoot:true, shootEvery: Math.max(60, 150 - stageIdx*5), shotSpeed: 3 + stageIdx*0.14, scd:70 }); break;
+      case "charger":  Object.assign(e, { w:34, h:30, vx:dir*0.7*mul, patrolVx:dir*0.7*mul, charger:true, range:220, cd:60, charge:0 }); break;
+      case "drifter":  Object.assign(e, { w:30, h:30, fly:true, hover:true }); break;
+      case "flyer":    Object.assign(e, { w:30, h:26, y:gy - TILE*2, baseY:gy - TILE*2, vx:dir*1.3*mul, fly:true, ph:Math.random()*6.28, amp:24 }); break;
+      case "diver":    Object.assign(e, { w:30, h:28, y:gy - TILE*3, baseY:gy - TILE*3, vx:dir*1.2*mul, fly:true, diver:true, phase:"cruise", amp:14 }); break;
+      case "zigzag":   Object.assign(e, { w:28, h:26, y:gy - TILE*2, baseY:gy - TILE*2, vx:dir*1.4*mul, fly:true, zig:true }); break;
+      case "turret":   Object.assign(e, { w:32, h:28, spiky:true, shoot:true, shootEvery: Math.max(56, 140 - stageIdx*4), shotSpeed: 3.4 + stageIdx*0.14, scd:50 }); break;
+      case "spiker":   Object.assign(e, { w:32, h:30, vx:dir*0.8*mul, spiky:true }); break;
+      case "bomber":   Object.assign(e, { w:34, h:26, y:gy - TILE*3, baseY:gy - TILE*3, vx:dir*1.5*mul, fly:true, bomber:true, amp:10, scd:70, shootEvery: Math.max(48, 110 - stageIdx*3) }); break;
+      case "spitter":  Object.assign(e, { w:34, h:30, spread:true, shootEvery: Math.max(70, 150 - stageIdx*4), scd:80 }); break;
+    }
+    return e;
   }
 
   function loadLevel(idx) {
@@ -1004,52 +1032,21 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   }
 
   function updateEnemies() {
-    const p = player, pcx = p.x + p.w/2;
+    const p = player, pcx = p.x + p.w/2, pcy = p.y + p.h/2, floorTop = levelH - TILE;
     for (const e of enemies) {
       if (!e.alive) { e.squash = Math.max(0, e.squash - 1); continue; }
       e.t = (e.t || 0) + 1;
 
-      if (e.fly) {
-        // Voadores (morcego/inseto): padrão senoidal, sem gravidade, viram nas paredes
-        e.ph = (e.ph || 0) + 0.08;
-        e.x += e.vx;
-        for (const s of solids) if (rectsOverlap(e, s)) { if (e.vx > 0) e.x = s.x - e.w; else e.x = s.x + s.w; e.vx *= -1; }
-        e.y = e.baseY + Math.sin(e.ph) * (e.amp || 26);
-        if (e.x < TILE) { e.x = TILE; e.vx = Math.abs(e.vx); }
-        if (e.x + e.w > levelW - TILE) { e.x = levelW - TILE - e.w; e.vx = -Math.abs(e.vx); }
-      } else {
-        // Patrol with gravity
-        e.vy = (e.vy || 0) + GRAVITY;
-        if (e.vy > 14) e.vy = 14;
-        e.x += e.vx;
-        for (const s of solids) if (rectsOverlap(e, s)) { if (e.vx > 0) e.x = s.x - e.w; else e.x = s.x + s.w; e.vx *= -1; }
-        e.y += e.vy;
-        let grounded = false;
-        for (const s of solids) {
-          if (rectsOverlap(e, s)) {
-            if (e.vy > 0) { e.y = s.y - e.h; e.vy = 0; grounded = true; }
-            else { e.y = s.y + s.h; e.vy = 0; }
-          }
-        }
-        e.grounded = grounded;
-        // pulador: salta de tempos em tempos (em direção ao jogador)
-        if (e.jump && grounded && e.t % (e.jumpEvery || 100) === 0) {
-          e.vy = -9.5; e.vx = Math.abs(e.vx || 0.8) * (pcx < e.x + e.w/2 ? -1 : 1);
-        }
-        // vira nas beiras (só quando no chão e sem pulo pendente)
-        if (grounded && e.vy === 0) {
-          const aheadX = e.vx > 0 ? e.x + e.w + 2 : e.x - 2, footY = e.y + e.h + 4;
-          let floor = false;
-          for (const s of solids) if (aheadX >= s.x && aheadX <= s.x + s.w && footY >= s.y && footY <= s.y + s.h) { floor = true; break; }
-          if (!floor && e.vx) e.vx *= -1;
-        }
-        if (e.y > levelH + 80) e.alive = false;
-      }
+      if (e.fly) enemyFly(e, pcx, pcy, floorTop);
+      else       enemyGround(e, pcx);
 
-      // atirador: dispara um projétil em direção ao jogador
-      if (e.shoot) {
+      // ataques à distância
+      if (e.shoot || e.lob || e.spread) {
         e.scd = (e.scd || 0) - 1;
-        if (e.scd <= 0 && Math.abs(pcx - (e.x + e.w/2)) < 360) { shootEnemy(e); e.scd = e.shootEvery || 120; }
+        if (e.scd <= 0 && Math.abs(pcx - (e.x + e.w/2)) < 380) {
+          if (e.lob) lobEnemy(e); else if (e.spread) spreadEnemy(e); else shootEnemy(e);
+          e.scd = e.shootEvery || 120;
+        }
       }
 
       // Colisão com o jogador
@@ -1061,17 +1058,106 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
           score += 100; updateHUD();
           spawnPop(e.x + e.w/2, e.y + e.h/2);
           snd("stomp");
+          if (e.split) spawnSplit(e);      // divisor: vira dois pequenos
         } else {
-          damagePlayer();     // espinho (não pisável) ou toque comum
+          damagePlayer();                  // espinho (não pisável) ou toque comum
         }
       }
     }
   }
 
-  // Projétil de inimigo atirador (dano ao jogador; some em parede/limite)
-  function shootEnemy(e) {
+  // Física de piso + comportamentos terrestres (anda, pula, rola, investe)
+  function enemyGround(e, pcx) {
+    e.vy = (e.vy || 0) + GRAVITY; if (e.vy > 14) e.vy = 14;
+    // investida: acelera em direção ao jogador por um instante
+    if (e.charger) {
+      if (e.charge > 0) { e.charge--; if (e.charge === 0) e.vx = e.patrolVx; }
+      else if (e.grounded && (e.cd = (e.cd || 0) - 1) <= 0 && Math.abs(pcx - (e.x + e.w/2)) < e.range) {
+        e.charge = 42; e.cd = 130; e.vx = (pcx < e.x + e.w/2 ? -1 : 1) * 4.6;
+      }
+    }
+    e.x += e.vx;
+    for (const s of solids) if (rectsOverlap(e, s)) { if (e.vx > 0) e.x = s.x - e.w; else e.x = s.x + s.w; e.vx *= -1; }
+    e.y += e.vy;
+    let grounded = false;
+    for (const s of solids) if (rectsOverlap(e, s)) { if (e.vy > 0) { e.y = s.y - e.h; e.vy = 0; grounded = true; } else { e.y = s.y + s.h; e.vy = 0; } }
+    e.grounded = grounded;
+    if (e.jump && grounded && e.t % (e.jumpEvery || 100) === 0) {
+      e.vy = e.jumpVy || -9.5;
+      if (e.chase) e.vx = Math.abs(e.vx || 0.8) * (pcx < e.x + e.w/2 ? -1 : 1);
+    }
+    // vira nas beiras (o "roller" NÃO — ele despenca; e não vira durante a investida)
+    const canLedgeTurn = grounded && e.vy === 0 && !e.roller && !(e.charger && e.charge > 0);
+    if (canLedgeTurn) {
+      const aheadX = e.vx > 0 ? e.x + e.w + 2 : e.x - 2, footY = e.y + e.h + 4;
+      let floor = false;
+      for (const s of solids) if (aheadX >= s.x && aheadX <= s.x + s.w && footY >= s.y && footY <= s.y + s.h) { floor = true; break; }
+      if (!floor && e.vx) e.vx *= -1;
+    }
+    if (e.y > levelH + 80) e.alive = false;
+  }
+
+  // Comportamentos aéreos (senoidal, pairar/perseguir, mergulhar, zigue-zague, bombardear)
+  function enemyFly(e, pcx, pcy, floorTop) {
+    if (e.hover) {                          // pairador: persegue o jogador pelo ar
+      const dx = pcx - (e.x + e.w/2), dy = pcy - (e.y + e.h/2), d = Math.hypot(dx, dy) || 1;
+      e.x += dx / d * 1.15; e.y += dy / d * 0.95;
+    } else if (e.diver) {                   // mergulhador: cruza e mergulha no jogador
+      e.x += e.vx;
+      if (e.x < TILE) { e.x = TILE; e.vx = Math.abs(e.vx); }
+      if (e.x + e.w > levelW - TILE) { e.x = levelW - TILE - e.w; e.vx = -Math.abs(e.vx); }
+      if (e.phase === "cruise") {
+        e.y = e.baseY + Math.sin(e.t * 0.08) * e.amp;
+        if (e.t % 150 === 120 && Math.abs(pcx - (e.x + e.w/2)) < 180) { e.phase = "dive"; e.dy = 2; }
+      } else if (e.phase === "dive") {
+        e.dy += 0.55; e.y += e.dy;
+        if (e.y >= floorTop - e.h - 2) { e.y = floorTop - e.h - 2; e.phase = "rise"; }
+      } else {                              // rise
+        e.y -= 3; if (e.y <= e.baseY) { e.y = e.baseY; e.phase = "cruise"; }
+      }
+    } else if (e.zig) {                      // zigue-zague (onda triangular)
+      e.x += e.vx;
+      if (e.x < TILE) { e.x = TILE; e.vx = Math.abs(e.vx); }
+      if (e.x + e.w > levelW - TILE) { e.x = levelW - TILE - e.w; e.vx = -Math.abs(e.vx); }
+      const tri = Math.abs(((e.t * 0.05) % 2) - 1) * 2 - 1;   // -1..1 triangular
+      e.y = e.baseY + tri * 22;
+    } else {                                 // voador/bombardeiro: senoidal
+      e.ph = (e.ph || 0) + 0.08; e.x += e.vx;
+      if (e.x < TILE) { e.x = TILE; e.vx = Math.abs(e.vx); }
+      if (e.x + e.w > levelW - TILE) { e.x = levelW - TILE - e.w; e.vx = -Math.abs(e.vx); }
+      e.y = e.baseY + Math.sin(e.ph) * (e.amp || 26);
+      if (e.bomber) {                        // bombardeiro: solta bombas em cima do jogador
+        e.scd = (e.scd || 0) - 1;
+        if (e.scd <= 0 && Math.abs(pcx - (e.x + e.w/2)) < 130) { dropBomb(e); e.scd = e.shootEvery || 90; }
+      }
+    }
+    // pairador/zigue mantêm dentro da arena
+    e.x = Math.max(TILE, Math.min(e.x, levelW - TILE - e.w));
+    if (e.hover) e.y = Math.max(TILE, Math.min(e.y, floorTop - e.h + 8));
+  }
+
+  function spawnSplit(e) {   // divisor: gera dois "filhotes" andarilhos
+    for (const d of [-1, 1]) enemies.push({ x:e.x + e.w/2 - 10, y:e.y, w:20, h:20, vx:d*1.7, vy:-3, alive:true, squash:0, t:0, type:"mini" });
+  }
+
+  // Projéteis de inimigos (dano ao jogador; somem em parede/limite)
+  function shootEnemy(e) {   // bolt reto em direção ao jogador
     const ox = e.x + e.w/2, dir = player.x + player.w/2 < ox ? -1 : 1;
-    enemyShots.push({ x:ox - 7, y:e.y + e.h*0.3, w:14, h:14, vx:dir * (e.shotSpeed || 3), vy:-1, t:0 });
+    enemyShots.push({ x:ox - 7, y:e.y + e.h*0.3, w:14, h:14, vx:dir * (e.shotSpeed || 3), vy:-0.6, t:0, kind:"bolt" });
+    snd("shoot");
+  }
+  function lobEnemy(e) {      // arco alto (morteiro)
+    const ox = e.x + e.w/2, dir = player.x + player.w/2 < ox ? -1 : 1;
+    enemyShots.push({ x:ox - 8, y:e.y, w:16, h:16, vx:dir * 2.2, vy:-6.4, t:0, kind:"bomb" });
+    snd("shoot");
+  }
+  function spreadEnemy(e) {   // leque de 3 projéteis
+    const ox = e.x + e.w/2;
+    for (const a of [-0.5, 0, 0.5]) enemyShots.push({ x:ox - 7, y:e.y + 2, w:14, h:14, vx:Math.sin(a) * 3.2, vy:-4.6 + Math.abs(a) * 0.6, t:0, kind:"bolt" });
+    snd("shoot");
+  }
+  function dropBomb(e) {      // bomba que cai (bombardeiro)
+    enemyShots.push({ x:e.x + e.w/2 - 7, y:e.y + e.h, w:14, h:16, vx:0, vy:0.6, t:0, kind:"bomb" });
     snd("shoot");
   }
   function updateEnemyShots() {
@@ -2009,23 +2095,90 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
         }
         continue;
       }
-      if (e.type === "bat")          drawBat(ex, e.y, e.w, e.h);
-      else if (e.type === "jumper")  drawJumper(ex, e.y, e.w, e.h, e);
-      else if (e.type === "shooter") drawShooter(ex, e.y, e.w, e.h, e);
-      else if (e.type === "flyer")   drawFlyer(ex, e.y, e.w, e.h, e);
-      else if (e.type === "spiker")  drawSpiker(ex, e.y, e.w, e.h);
-      else drawEnemy(ex, e.y, e.w, e.h, e.vx);
+      const dir = e.vx < 0 ? -1 : 1;
+      switch (e.type) {
+        case "bat":     drawBat(ex, e.y, e.w, e.h); break;
+        case "jumper":  drawJumper(ex, e.y, e.w, e.h, e); break;
+        case "shooter": drawShooter(ex, e.y, e.w, e.h, e); break;
+        case "flyer":   drawFlyer(ex, e.y, e.w, e.h, e); break;
+        case "spiker":  drawSpiker(ex, e.y, e.w, e.h); break;
+        case "hopper":  drawCritter(ex, e.y, e.w, e.h, { body:"#e08a2e", belly:"#f6c98a", feet:"#a5641c", dir }); break;
+        case "roller":  drawRoller(ex, e.y, e.w, e.h, e); break;
+        case "lobber":  drawCritter(ex, e.y, e.w, e.h, { body:"#2f7d55", belly:"#bfe3a0", feet:"#1f5a3a", mouth:true, dir }); break;
+        case "splitter":drawCritter(ex, e.y, e.w, e.h, { body:"#3f8fd0", belly:"#cfeaff", feet:"#2a6aa0", dir }); break;
+        case "mini":    drawCritter(ex, e.y, e.w, e.h, { body:"#3f8fd0", belly:"#cfeaff", dir }); break;
+        case "charger": drawCritter(ex, e.y, e.w, e.h, { body:"#8a5a2b", belly:"#c9975a", feet:"#4a2c14", horn:"#f2eecb", brows:true, dir }); break;
+        case "drifter": drawDrifter(ex, e.y, e.w, e.h, e); break;
+        case "diver":   drawWinged(ex, e.y, e.w, e.h, "#3a4670", "rgba(200,210,255,.85)"); break;
+        case "zigzag":  drawWinged(ex, e.y, e.w, e.h, "#c99a2e", "rgba(255,235,120,.9)"); break;
+        case "turret":  drawCritter(ex, e.y, e.w, e.h, { body:"#5a5e68", belly:"#8a8f9a", spikes:"#3d414a", snout:"#3d414a", dir }); break;
+        case "bomber":  drawWinged(ex, e.y, e.w, e.h, "#4a4a4a", "rgba(150,150,150,.85)", true); break;
+        case "spitter": drawCritter(ex, e.y, e.w, e.h, { body:"#7a3fb0", belly:"#c9a6e6", feet:"#3a1c58", mouth:true, dir }); break;
+        default:        drawEnemy(ex, e.y, e.w, e.h, e.vx);
+      }
     }
   }
 
-  // Projéteis dos inimigos atiradores (bolha de energia)
+  // Projéteis dos inimigos: bolha de energia (bolt) ou bomba (bomb)
   function drawEnemyShots() {
     for (const s of enemyShots) {
       const cx = s.x - cameraX + s.w/2, cy = s.y + s.h/2;
       if (cx < -20 || cx > W + 20) continue;
-      ctx.fillStyle = "#c07bff"; ctx.beginPath(); ctx.ellipse(cx, cy, s.w/2, s.h/2, 0, 0, 7); ctx.fill();
-      ctx.fillStyle = "#f0d6ff"; ctx.beginPath(); ctx.arc(cx - 2, cy - 2, 2.2, 0, 7); ctx.fill();
+      if (s.kind === "bomb") {
+        ctx.fillStyle = "#2b2b2b"; ctx.beginPath(); ctx.arc(cx, cy, s.w/2, 0, 7); ctx.fill();
+        ctx.strokeStyle = "#e0803a"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx + 3, cy - s.h/2); ctx.lineTo(cx + 7, cy - s.h/2 - 4); ctx.stroke();
+        ctx.fillStyle = "#ffce54"; ctx.beginPath(); ctx.arc(cx + 7, cy - s.h/2 - 4, 2, 0, 7); ctx.fill();
+      } else {
+        ctx.fillStyle = "#c07bff"; ctx.beginPath(); ctx.ellipse(cx, cy, s.w/2, s.h/2, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = "#f0d6ff"; ctx.beginPath(); ctx.arc(cx - 2, cy - 2, 2.2, 0, 7); ctx.fill();
+      }
     }
+  }
+
+  // Desenhador genérico de "bicho" terrestre (varia cor e adereços)
+  function drawCritter(x, y, w, h, o) {
+    const cx = x + w/2, by = y + h, dir = o.dir || 1;
+    if (o.feet) { ctx.fillStyle = o.feet; const fp = Math.sin(performance.now()/100) * 2; ctx.fillRect(cx - 12, by - 5 + fp, 7, 6); ctx.fillRect(cx + 5, by - 5 - fp, 7, 6); }
+    ctx.fillStyle = o.body; ctx.beginPath(); ctx.ellipse(cx, by - h*0.38, w*0.46, h*0.42, 0, 0, 7); ctx.fill();
+    if (o.belly) { ctx.fillStyle = o.belly; ctx.beginPath(); ctx.ellipse(cx, by - h*0.28, w*0.26, h*0.26, 0, 0, 7); ctx.fill(); }
+    if (o.spikes) { ctx.fillStyle = o.spikes; for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(cx + i*8 - 4, by - h*0.6); ctx.lineTo(cx + i*8, by - h*0.82); ctx.lineTo(cx + i*8 + 4, by - h*0.6); ctx.fill(); } }
+    if (o.horn) { ctx.fillStyle = o.horn; ctx.beginPath(); ctx.moveTo(cx - 4, by - h*0.66); ctx.lineTo(cx, by - h*0.92); ctx.lineTo(cx + 4, by - h*0.66); ctx.fill(); }
+    if (o.snout) { ctx.fillStyle = o.snout; ctx.fillRect(cx + dir*w*0.18, by - h*0.5, dir*w*0.32, 8); }
+    if (o.brows) { ctx.fillStyle = o.body; ctx.beginPath(); ctx.moveTo(cx - 12, by - h*0.6); ctx.lineTo(cx - 2, by - h*0.5); ctx.lineTo(cx - 12, by - h*0.47); ctx.fill(); ctx.beginPath(); ctx.moveTo(cx + 12, by - h*0.6); ctx.lineTo(cx + 2, by - h*0.5); ctx.lineTo(cx + 12, by - h*0.47); ctx.fill(); }
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx - 6, by - h*0.46, 5, 0, 7); ctx.arc(cx + 6, by - h*0.46, 5, 0, 7); ctx.fill();
+    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(cx - 6 + dir, by - h*0.46, 2.4, 0, 7); ctx.arc(cx + 6 + dir, by - h*0.46, 2.4, 0, 7); ctx.fill();
+    if (o.mouth) { ctx.fillStyle = "#3a0f2a"; ctx.beginPath(); ctx.ellipse(cx, by - h*0.2, w*0.16, 4, 0, 0, 7); ctx.fill(); }
+  }
+  // Rolador: bola listrada que gira
+  function drawRoller(x, y, w, h, e) {
+    const cx = x + w/2, cy = y + h - h*0.4, r = w*0.44, rot = (e.x || 0) * 0.12;
+    ctx.fillStyle = "#c0392b"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+    ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-r, 0); ctx.lineTo(r, 0); ctx.moveTo(0, -r); ctx.lineTo(0, r); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx - 5, cy - 3, 4, 0, 7); ctx.arc(cx + 5, cy - 3, 4, 0, 7); ctx.fill();
+    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(cx - 5, cy - 3, 2, 0, 7); ctx.arc(cx + 5, cy - 3, 2, 0, 7); ctx.fill();
+  }
+  // Pairador fantasma (persegue pelo ar)
+  function drawDrifter(x, y, w, h, e) {
+    const cx = x + w/2, cy = y + h/2;
+    ctx.fillStyle = "rgba(190,170,225,.9)";
+    ctx.beginPath(); ctx.arc(cx, cy - 2, w*0.42, Math.PI, 0);
+    ctx.quadraticCurveTo(cx + w*0.42, cy + h*0.36, cx + w*0.16, cy + h*0.3);
+    ctx.quadraticCurveTo(cx, cy + h*0.44, cx - w*0.16, cy + h*0.3);
+    ctx.quadraticCurveTo(cx - w*0.42, cy + h*0.36, cx - w*0.42, cy - 2); ctx.fill();
+    ctx.fillStyle = "#3a2b52"; ctx.beginPath(); ctx.arc(cx - 6, cy - 2, 3, 0, 7); ctx.arc(cx + 6, cy - 2, 3, 0, 7); ctx.fill();
+  }
+  // Voador com asas (mergulhador/zigue/bombardeiro)
+  function drawWinged(x, y, w, h, body, wing, bomb) {
+    const cx = x + w/2, cy = y + h/2, flap = Math.sin(performance.now()/70) * 0.6;
+    ctx.fillStyle = wing;
+    for (const sg of [-1, 1]) { ctx.save(); ctx.translate(cx, cy - 2); ctx.scale(sg, 1); ctx.rotate(-0.2 + flap); ctx.beginPath(); ctx.ellipse(w*0.42, 0, w*0.4, h*0.26, 0, 0, 7); ctx.fill(); ctx.restore(); }
+    ctx.fillStyle = body; ctx.beginPath(); ctx.ellipse(cx, cy, w*0.3, h*0.36, 0, 0, 7); ctx.fill();
+    if (bomb) { ctx.fillStyle = "#2b2b2b"; ctx.beginPath(); ctx.arc(cx, cy + h*0.3, 4, 0, 7); ctx.fill(); }
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(cx - 4, cy - 3, 3, 0, 7); ctx.arc(cx + 4, cy - 3, 3, 0, 7); ctx.fill();
+    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(cx - 4, cy - 3, 1.6, 0, 7); ctx.arc(cx + 4, cy - 3, 1.6, 0, 7); ctx.fill();
   }
   // Pulador: sapinho saltitante de patas grandes
   function drawJumper(x, y, w, h, e) {
