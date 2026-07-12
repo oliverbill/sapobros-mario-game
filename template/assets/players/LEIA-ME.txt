@@ -1,2 +1,0 @@
-Ponha aqui os PNG dos personagens jogáveis (fundo transparente).
-Ex.: hero1.png, hero2.png — referencie em players[].image no game.config.js

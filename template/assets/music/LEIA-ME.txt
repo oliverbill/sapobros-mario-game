@@ -1,2 +1,0 @@
-Ponha aqui as musicas (mp3/ogg), uma por tema.
-Referencie em music{} no game.config.js
