@@ -445,9 +445,9 @@ try {
     await page.click("#startBtn"); await sleep(120);
     const bad = await page.evaluate(async () => {
       const T = 40, problems = [];
-      for (let lvl = 0; lvl < 3; lvl++) {
+      for (let lvl = 0; lvl < 15; lvl++) {
         window.__DINO.enterLevel(lvl);
-        await new Promise(r => setTimeout(r, 40));
+        await new Promise(r => setTimeout(r, 25));
         const solids = window.__DINO.solids();
         const solidAt = (x, y) => solids.some(s => x >= s.x && x < s.x + s.w && y >= s.y && y < s.y + s.h);
         // cada cano: as 2 células diretamente acima do topo devem estar livres
@@ -465,6 +465,25 @@ try {
     });
     check("canos têm espaço livre acima (entrar/pular por cima)", bad.filter(x => x.includes("cano")).length === 0, bad.join("; "));
     check("nenhum bloco ? inacessível em nenhuma fase", bad.filter(x => x.includes("bloco")).length === 0, bad.join("; "));
+    await ctx.close();
+  }
+
+  // ---------- 18. 15 fases carregáveis, cada uma com bandeira ----------
+  {
+    const { ctx, page } = await newGame();
+    await page.click("#startBtn"); await sleep(120);
+    const r = await page.evaluate(async () => {
+      let ok = 0, withFlag = 0;
+      for (let i = 0; i < 15; i++) {
+        window.__DINO.enterLevel(i);
+        await new Promise(r => setTimeout(r, 20));
+        if (window.__DINO.state === "play") ok++;
+        if (window.__DINO.flag()) withFlag++;
+      }
+      return { ok, withFlag };
+    });
+    check("existem 15 fases carregáveis", r.ok === 15, JSON.stringify(r));
+    check("todas as 15 fases têm bandeira", r.withFlag === 15, JSON.stringify(r));
     await ctx.close();
   }
 

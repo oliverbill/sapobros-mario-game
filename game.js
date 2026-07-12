@@ -125,6 +125,126 @@ GGGGGGGGGGGGGGGGGG....GGGGGGGGGGGGGGG..GGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGG
 .........BBBB.....................E..............BBB...........G................
 ..P..E..........BB.....?.....E..........BB..E.........?...E....G................
 GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+................................................................................
+............???...........????..............???.................................
+............BBB....???....BBBB..................................................
+.....................................???........................................
+.............................BBB................................................
+..P..................................................E...E................F.....
+GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+.................................?????..........................................
+.................................BBBBB..................?????...................
+................BBB............BBBB..............????...........................
+..................................................???...........................
+..................................................BBB...........................
+..P...........E..E................E.......................................F.....
+GGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGG..GGGGGGG...GGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+................................................................................
+..............................???.............................BBBB..............
+..........................BBB..............????...............?????.............
+...........................................BBB...........???..BB???.............
+................................................................BBB.............
+..P................E..........E............E..............................F.....
+GGGGGGGGGGGGGGG...GGGGGG...GGGGGGGGGGGGGG..GGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+....................???.....???.................................................
+....................BBB.........???.............................................
+....................BBB.....???.................................................
+........................???....???................???......BBB..................
+................................................................................
+..P...................E..........E........................................F.....
+GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+................................................................................
+..............???..........................................???..................
+..............................................???....?????......................
+.........................????.......???...........???BBBBB......................
+.........................BBBB.......BBB...........BBB...........................
+..P...................E..........E..............E.........................F.....
+GGGGGGGGGGGGG...GGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+............................................???..????...........................
+..............................???....?????..BBB..BBBB...........................
+...........................???.......BBBBB......................................
+...........????.....???..........................BBBB...........................
+...........BBBB.................................................................
+..P.....................E...........E..E..................................F.....
+GGGGGGGGGGGGGGGGGGGG...GGGGGGG..GGGGGGGG...GGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+........................?????.....??????........................................
+........................BBBBB.???...............................................
+.................................................BBBBB..???...???...............
+................................................................................
+..............BBBB..............................................................
+..P............E.......................................E..................F.....
+GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+....................................???......???????............................
+.............???.............................BBBBB..........???.................
+.................................????.................BBBB......................
+.............................BBBBBBBB...........................................
+................................................................................
+..P.................E.....................E.......E.......................F.....
+GGGGGGGGGGGGGGGGGGGGGGG..GGGGGGGG..GGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+...........?????.????...................................???.....................
+...........BBB????BBB.............????.???......................................
+..............BBBB................BBBB..........................................
+.................................................???............................
+................................................................................
+..P...........................E..........E...............E................F.....
+GGGGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGG...GGGGGG...GGGGGG..GGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+..............................???.................???...........................
+.....................???........................................................
+..................................................???.BBBB......................
+........................................BBBBB...................................
+...................BBBBB........................................................
+..P...............................E....................E..................F.....
+GGGGGGGGGGGGGGG..GGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+................................................................................
+...............????..................???........................................
+............???BBBB.............................................................
+............BBB.....???..............BBBB......???.....???.???..................
+.......................BBB......................................................
+..P.............E.......................................E..E..............F.....
+GGGGGGGGGGGGGGGGG...GGGGGGGGGGGGGGGGGGGG..GGGGGGGGGG...GGGGGGGGGGGGGGGGGGGGGGGGG`,
+`................................................................................
+................................................................................
+................................................................................
+.........................???.........???.............???........................
+...............????...................???............BBB........................
+...............BBBB..............?BBBBB..................BBB....................
+.................................???...............????.........................
+...................................................BBBB.........................
+..P................E...E.....................E...........E................F.....
+GGGGGGGGGGGGGGG...GGGGGGGGGGGGG...GGGGGGG..GGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGG`,
   ];
 
   // Posições dos power-ups por fase (em coordenadas de tile: col, row),
@@ -133,6 +253,18 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     [ {type:"mushroom", col:6,  row:8}, {type:"fire", col:46, row:8}, {type:"fly", col:72, row:8} ],
     [ {type:"mushroom", col:5,  row:8}, {type:"fire", col:30, row:8}, {type:"fly", col:66, row:8} ],
     [ {type:"mushroom", col:6,  row:8}, {type:"fire", col:40, row:8}, {type:"fly", col:70, row:8} ],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":34,"row":8},{"type":"fly","col":62,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":36,"row":8},{"type":"fly","col":63,"row":8}],
+    [{"type":"mushroom","col":12,"row":8},{"type":"fire","col":36,"row":8},{"type":"fly","col":61,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":34,"row":8},{"type":"fly","col":62,"row":8}],
+    [{"type":"mushroom","col":12,"row":8},{"type":"fire","col":39,"row":8},{"type":"fly","col":64,"row":8}],
+    [{"type":"mushroom","col":16,"row":8},{"type":"fire","col":38,"row":8},{"type":"fly","col":64,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":38,"row":8},{"type":"fly","col":62,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":37,"row":8},{"type":"fly","col":62,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":33,"row":8},{"type":"fly","col":63,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":41,"row":8},{"type":"fly","col":63,"row":8}],
+    [{"type":"mushroom","col":13,"row":8},{"type":"fire","col":36,"row":8},{"type":"fly","col":63,"row":8}],
+    [{"type":"mushroom","col":12,"row":8},{"type":"fire","col":35,"row":8},{"type":"fly","col":64,"row":8}]
   ];
   function spawnPowerup(type, x, y) {
     if (type === "mushroom")
@@ -148,6 +280,18 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     [ {col:6,  row:6, item:"mushroom"}, {col:37, row:6, item:"fire"} ],
     [ {col:11, row:5, item:"mushroom"}, {col:39, row:5, item:"fly"} ],
     [ {col:6,  row:5, item:"mushroom"}, {col:37, row:5, item:"fire"} ],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":41,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":48,"row":6,"item":"fly"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":55,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":54,"row":6,"item":"fly"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":59,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":57,"row":6,"item":"fly"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":47,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":50,"row":6,"item":"fly"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":41,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":53,"row":6,"item":"fly"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":51,"row":6,"item":"fire"}],
+    [{"col":8,"row":6,"item":"mushroom"},{"col":43,"row":6,"item":"fly"}]
   ];
   // Canos gigantes por fase: o jogador entra (seta para baixo) para o subterrâneo.
   // Posições validadas: base no chão, espaço livre acima (subir/entrar/pular por cima).
@@ -155,6 +299,18 @@ GGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGG..GGGGGGGGGGGGGGGGGGGGGGGGGGGG
     [ {col:59, row:7} ],
     [ {col:62, row:6} ],
     [ {col:46, row:6} ],
+    [{"col":46,"row":7}],
+    [{"col":43,"row":7}],
+    [{"col":47,"row":7}],
+    [{"col":44,"row":7}],
+    [{"col":42,"row":7}],
+    [{"col":45,"row":7}],
+    [{"col":42,"row":7}],
+    [{"col":45,"row":7}],
+    [{"col":59,"row":7}],
+    [{"col":47,"row":7}],
+    [{"col":44,"row":7}],
+    [{"col":48,"row":7}]
   ];
 
   // Cenário subterrâneo especial (acessado pelos canos): escuro, com morcegos,
@@ -1005,30 +1161,124 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   // ============================================================
   //  RENDER
   // ============================================================
-  function drawBackground() {
-    if (underground) { drawCaveBackground(); return; }
-    // sky gradient
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#5c94fc"); g.addColorStop(1, "#a8e0ff");
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const THEME_LIST = ["bosque", "selva", "praia", "castelo", "ceu"];
+  const GROUND_COLORS = {
+    bosque:  { top:"#5fa83d", top2:"#4d8a30", dirt:"#8a5a2b" },
+    selva:   { top:"#4f9a34", top2:"#3f7f28", dirt:"#6b4a24" },
+    praia:   { top:"#ecd79a", top2:"#dcc47a", dirt:"#cdb06a" },
+    castelo: { top:"#5fa83d", top2:"#4d8a30", dirt:"#9a6a3a" },
+    ceu:     { top:"#8fd0a0", top2:"#e6eef5", dirt:"#b8c8d8" },
+  };
+  function curTheme() { return underground ? "cave" : (THEME_LIST[Math.floor(levelIdx / 3)] || "bosque"); }
 
-    // parallax hills
+  function drawBackground() {
+    const th = curTheme();
+    if (th === "cave") return drawCaveBackground();
+    if (th === "selva") return drawSelvaBG();
+    if (th === "praia") return drawPraiaBG();
+    if (th === "castelo") return drawCasteloBG();
+    if (th === "ceu") return drawCeuBG();
+    return drawBosqueBG();
+  }
+
+  function skyGrad(top, bot) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, top); g.addColorStop(1, bot);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  function parallaxHills(c1, c2) {
+    ctx.fillStyle = c1;
     const off = cameraX * 0.3;
-    ctx.fillStyle = "#6fae54";
-    for (let i = -1; i < 6; i++) {
-      const hx = i * 260 - (off % 260);
-      hillArc(hx, H - 70, 150, 90);
-    }
-    ctx.fillStyle = "#5a9945";
+    for (let i = -1; i < 6; i++) hillArc(i * 260 - (off % 260), H - 70, 150, 90);
+    ctx.fillStyle = c2;
     const off2 = cameraX * 0.5;
-    for (let i = -1; i < 8; i++) {
-      const hx = i * 200 - (off2 % 200);
-      hillArc(hx, H - 55, 110, 70);
-    }
-    // clouds
-    ctx.fillStyle = "rgba(255,255,255,.85)";
+    for (let i = -1; i < 8; i++) hillArc(i * 200 - (off2 % 200), H - 55, 110, 70);
+  }
+  function clouds(alpha) {
+    ctx.fillStyle = "rgba(255,255,255," + alpha + ")";
     const co = cameraX * 0.15;
     for (let i = -1; i < 6; i++) cloud(i * 240 - (co % 240) + 60, 60 + (i % 2) * 30);
+  }
+
+  // BOSQUE — floresta ensolarada (padrão)
+  function drawBosqueBG() {
+    skyGrad("#5c94fc", "#a8e0ff");
+    parallaxHills("#6fae54", "#5a9945");
+    clouds(0.85);
+  }
+
+  // SELVA — verde denso, céu esverdeado e cipós ao fundo
+  function drawSelvaBG() {
+    skyGrad("#2f7d63", "#a6e0b0");
+    parallaxHills("#2f7a3c", "#245f2e");
+    // cipós pendurados
+    ctx.strokeStyle = "rgba(30,90,45,.5)"; ctx.lineWidth = 4;
+    const off = cameraX * 0.4;
+    for (let i = -1; i < 8; i++) {
+      const vx = i * 130 - (off % 130) + 40;
+      ctx.beginPath(); ctx.moveTo(vx, 0);
+      ctx.quadraticCurveTo(vx + 10, 60, vx, 120 + (i % 3) * 30); ctx.stroke();
+      ctx.fillStyle = "rgba(40,120,60,.5)";
+      ctx.beginPath(); ctx.arc(vx, 120 + (i % 3) * 30, 7, 0, 7); ctx.fill();
+    }
+    clouds(0.35);
+  }
+
+  // PRAIA — céu claro, mar com ondas e dunas de areia
+  function drawPraiaBG() {
+    skyGrad("#6db3ff", "#cdecff");
+    clouds(0.8);
+    // mar
+    const seaY = H - 96;
+    ctx.fillStyle = "#2f8fd6"; ctx.fillRect(0, seaY, W, H - seaY);
+    ctx.fillStyle = "#57a9e6"; ctx.fillRect(0, seaY, W, 10);
+    // ondas
+    const t = performance.now() / 400;
+    ctx.fillStyle = "rgba(255,255,255,.7)";
+    for (let i = -1; i < 14; i++) {
+      const wx = i * 70 - ((cameraX * 0.5) % 70);
+      ctx.beginPath();
+      ctx.ellipse(wx, seaY + 8 + Math.sin(t + i) * 3, 22, 5, 0, 0, 7); ctx.fill();
+    }
+    // dunas de areia
+    ctx.fillStyle = "#e9d29a";
+    const off = cameraX * 0.35;
+    for (let i = -1; i < 7; i++) hillArc(i * 220 - (off % 220), H - 50, 130, 55);
+  }
+
+  // CASTELO — campo com um castelo (silhueta genérica) ao fundo
+  function drawCasteloBG() {
+    skyGrad("#5c94fc", "#bfe0ff");
+    clouds(0.8);
+    // castelo genérico ao longe (parallax lento)
+    const cx = W * 0.5 - (cameraX * 0.12) % (W + 300);
+    ctx.fillStyle = "#c9a26b";
+    const bx = cx, by = H - 130, bw = 150, bh = 90;
+    ctx.fillRect(bx, by, bw, bh);                         // corpo
+    for (const tx of [bx - 18, bx + bw - 12]) ctx.fillRect(tx, by - 40, 30, bh + 40);  // torres
+    ctx.fillStyle = "#8a6a3e";
+    ctx.fillRect(bx + bw/2 - 16, by + 30, 32, bh - 30);  // portão
+    // ameias
+    ctx.fillStyle = "#c9a26b";
+    for (let i = 0; i < 6; i++) ctx.fillRect(bx + 6 + i*24, by - 12, 12, 12);
+    // bandeirinhas nas torres
+    ctx.fillStyle = "#e63b2e";
+    for (const tx of [bx - 3, bx + bw + 3]) { ctx.fillRect(tx, by - 60, 2, 20); ctx.beginPath(); ctx.moveTo(tx+2,by-60); ctx.lineTo(tx+16,by-55); ctx.lineTo(tx+2,by-50); ctx.fill(); }
+    parallaxHills("#6fae54", "#5a9945");
+  }
+
+  // CÉU — nível nas nuvens, azul claro e muitas nuvens em camadas
+  function drawCeuBG() {
+    skyGrad("#7fb8ff", "#dff0ff");
+    // nuvens distantes
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    const c0 = cameraX * 0.08;
+    for (let i = -1; i < 7; i++) cloud(i * 210 - (c0 % 210), H - 90 + (i % 2) * 40);
+    // nuvens médias como "colinas"
+    ctx.fillStyle = "rgba(255,255,255,.9)";
+    const c1 = cameraX * 0.3;
+    for (let i = -1; i < 7; i++) { const hx = i * 240 - (c1 % 240); ctx.beginPath(); ctx.ellipse(hx, H - 40, 120, 46, 0, Math.PI, 0); ctx.fill(); }
+    clouds(0.95);
   }
   function hillArc(x, y, w, h) {
     ctx.beginPath(); ctx.moveTo(x - w, y);
@@ -1069,9 +1319,10 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
       } else if (s.type === "question") {
         drawQuestionBlock(sx, s.y, s);
       } else if (s.type === "ground") {
-        ctx.fillStyle = "#8a5a2b"; ctx.fillRect(sx, s.y, s.w, s.h);
-        ctx.fillStyle = "#5fa83d"; ctx.fillRect(sx, s.y, s.w, 10);
-        ctx.fillStyle = "#4d8a30"; ctx.fillRect(sx, s.y + 8, s.w, 4);
+        const gc = GROUND_COLORS[curTheme()] || GROUND_COLORS.bosque;
+        ctx.fillStyle = gc.dirt; ctx.fillRect(sx, s.y, s.w, s.h);
+        ctx.fillStyle = gc.top;  ctx.fillRect(sx, s.y, s.w, 10);
+        ctx.fillStyle = gc.top2; ctx.fillRect(sx, s.y + 8, s.w, 4);
         ctx.fillStyle = "rgba(0,0,0,.12)";
         ctx.fillRect(sx + 6, s.y + 18, 5, 5); ctx.fillRect(sx + 24, s.y + 28, 5, 5);
       } else if (s.type === "cave") {
@@ -1417,45 +1668,51 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
   }
 
   // ---------- MAPA DE FASES (overworld) ----------
-  const MAP_NODES = [
-    { x: 150, y: 300 }, { x: 400, y: 200 }, { x: 650, y: 320 },
-  ];
+  // 15 nós em serpentina (3 fileiras de 5), agrupados em 5 mundos (temas)
+  const MAP_NODES = (() => {
+    const nodes = [], perRow = 5, ys = [120, 235, 350], x0 = 78, x1 = 722;
+    for (let r = 0; r < 3; r++) for (let k = 0; k < perRow; k++) {
+      const idx = r * perRow + k;
+      const kk = (r % 2 === 0) ? k : (perRow - 1 - k);
+      nodes.push({ x: x0 + (x1 - x0) * (kk / (perRow - 1)), y: ys[r], world: Math.floor(idx / 3) });
+    }
+    return nodes;
+  })();
+  const WORLD_COLOR = ["#5fa83d", "#2f9a58", "#e0b866", "#8a6ad6", "#7fb8ff"];  // por tema
   function drawMap() {
-    // fundo do overworld
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, "#7ec0ee"); g.addColorStop(1, "#bfe3a0");
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    // "ilhas" verdes
     ctx.fillStyle = "#6fae54";
-    for (let i = 0; i < 5; i++) hillArc(i * 200 + 40, H - 40, 130, 80);
+    for (let i = 0; i < 5; i++) hillArc(i * 200 + 40, H - 30, 130, 70);
     // caminho ligando os nós
-    ctx.strokeStyle = "#e9d7a0"; ctx.lineWidth = 10; ctx.lineCap = "round";
-    ctx.setLineDash([2, 16]);
-    ctx.beginPath();
-    ctx.moveTo(MAP_NODES[0].x, MAP_NODES[0].y);
+    ctx.strokeStyle = "#e9d7a0"; ctx.lineWidth = 9; ctx.lineCap = "round";
+    ctx.setLineDash([2, 14]);
+    ctx.beginPath(); ctx.moveTo(MAP_NODES[0].x, MAP_NODES[0].y);
     for (let i = 1; i < MAP_NODES.length; i++) ctx.lineTo(MAP_NODES[i].x, MAP_NODES[i].y);
     ctx.stroke(); ctx.setLineDash([]);
     // nós
     for (let i = 0; i < MAP_NODES.length; i++) {
       const n = MAP_NODES[i], open = i <= unlocked, sel = i === mapSel;
-      ctx.fillStyle = open ? (i < unlocked ? "#39c463" : "#ffd23f") : "#8a8f9a";
-      ctx.strokeStyle = sel ? "#fff" : "rgba(0,0,0,.35)"; ctx.lineWidth = sel ? 5 : 3;
-      ctx.beginPath(); ctx.arc(n.x, n.y, 26, 0, 7); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = open ? "#3a2000" : "#e8e8e8";
-      ctx.font = "bold 22px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = open ? (i < unlocked ? "#39c463" : WORLD_COLOR[n.world]) : "#8a8f9a";
+      ctx.strokeStyle = sel ? "#fff" : "rgba(0,0,0,.35)"; ctx.lineWidth = sel ? 4 : 2.5;
+      ctx.beginPath(); ctx.arc(n.x, n.y, 20, 0, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = open ? "#fff" : "#e8e8e8";
+      ctx.font = "bold 16px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
       ctx.fillText(open ? String(i + 1) : "🔒", n.x, n.y + 1);
-      if (i < unlocked) { ctx.fillText("✓", n.x + 22, n.y - 20); }
+      if (i < unlocked) { ctx.font = "12px sans-serif"; ctx.fillStyle = "#0a5"; ctx.fillText("✓", n.x + 17, n.y - 15); }
     }
     ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
     // personagem no nó selecionado
     const sn = MAP_NODES[mapSel];
-    if (CHARACTERS[chosen].ready) drawSprite(ctx, chosen, sn.x, sn.y - 24, 56, 1, tick * 0.05 % 6.28, false);
+    if (CHARACTERS[chosen].ready) drawSprite(ctx, chosen, sn.x, sn.y - 20, 44, 1, tick * 0.05 % 6.28, false);
     // título + instrução
-    ctx.fillStyle = "rgba(0,0,0,.5)"; roundRect(W/2 - 150, 20, 300, 40, 10); ctx.fill();
-    ctx.fillStyle = "#fff"; ctx.font = "bold 22px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("🗺️ MAPA DE FASES", W/2, 41);
+    const WORLD_NAME = ["🌳 Bosque", "🌴 Selva", "🏖️ Praia", "🏰 Castelo", "☁️ Céu"];
+    ctx.fillStyle = "rgba(0,0,0,.5)"; roundRect(W/2 - 170, 16, 340, 38, 10); ctx.fill();
+    ctx.fillStyle = "#fff"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("🗺️ Fase " + (mapSel + 1) + "/15 · " + WORLD_NAME[MAP_NODES[mapSel].world], W/2, 35);
     ctx.font = "14px sans-serif"; ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.fillText("← →  escolher fase   ·   ↑ / ▲  entrar", W/2, H - 24);
+    ctx.fillText("← →  escolher fase   ·   ↑ / ▲  entrar", W/2, H - 18);
     ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
   }
 
@@ -1493,7 +1750,7 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
     const cy = (clientY - rect.top) * (canvas.height / rect.height);
     for (let i = 0; i < MAP_NODES.length; i++) {
       const n = MAP_NODES[i];
-      if (i <= unlocked && Math.hypot(cx - n.x, cy - n.y) < 30) {
+      if (i <= unlocked && Math.hypot(cx - n.x, cy - n.y) < 24) {
         if (window.Sound) window.Sound.resume();
         mapSel = i; enterLevel(i); return;
       }
@@ -1540,6 +1797,8 @@ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG`;
       chosen = s.chosen ?? chosen;
       infinite = !!s.infinite;
       invincible = !!s.invincible;
+      unlocked = s.unlocked ?? unlocked;   // preserva o progresso do mapa ao salvar
+      levelIdx = s.levelIdx ?? levelIdx;
       applyMute(!!s.muted);
     }
     infiniteChk.checked = infinite;
